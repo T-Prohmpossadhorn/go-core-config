@@ -255,10 +255,10 @@ App Name: my-app
       Settings    map[string]string `mapstructure:"settings" default:""`
   }
   ```
-- `Option`: Configures the Config instance.
-  ```go
-  type Option func(*Config)
-  ```
+- `Option`: Configures the Config instance and may return an error.
+ ```go
+ type Option func(*Config) error
+ ```
 
 ### Functions
 - `New(opts ...Option) (*Config, error)`: Creates a new Config instance, applying defaults and validating required fields.

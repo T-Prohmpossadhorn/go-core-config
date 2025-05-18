@@ -25,11 +25,12 @@ type ConfigStruct struct {
 }
 
 // Option configures the Config instance.
-type Option func(*Config)
+// Option configures the Config instance and may return an error.
+type Option func(*Config) error
 
 // WithFilepath sets the configuration file path (YAML or JSON).
 func WithFilepath(path string) Option {
-	return func(c *Config) {
+	return func(c *Config) error {
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		ext := strings.ToLower(filepath.Ext(path))
@@ -39,39 +40,37 @@ func WithFilepath(path string) Option {
 		case ".json":
 			c.v.SetConfigType("json")
 		default:
-			c.v.Set("error", fmt.Errorf("unsupported file format: %s", path))
-			return
+			return fmt.Errorf("unsupported file format: %s", path)
 		}
 		c.v.SetConfigFile(path)
 		if err := c.v.ReadInConfig(); err != nil {
-			c.v.Set("error", fmt.Errorf("failed to read config file %s: %w", path, err))
-			return
+			return fmt.Errorf("failed to read config file %s: %w", path, err)
 		}
 		if err := c.v.Unmarshal(&c.configStruct); err != nil {
-			c.v.Set("error", fmt.Errorf("failed to unmarshal ConfigStruct: %w", err))
-			return
+			return fmt.Errorf("failed to unmarshal ConfigStruct: %w", err)
 		}
 		if err := c.validateRequiredFields(); err != nil {
-			c.v.Set("error", err)
-			return
+			return err
 		}
+		return nil
 	}
 }
 
 // WithDefault sets default configuration values.
 func WithDefault(defaults map[string]interface{}) Option {
-	return func(c *Config) {
+	return func(c *Config) error {
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		for k, v := range defaults {
 			c.v.SetDefault(k, v)
 		}
+		return nil
 	}
 }
 
 // WithEnv loads configuration from environment variables.
 func WithEnv(prefix string) Option {
-	return func(c *Config) {
+	return func(c *Config) error {
 		c.mu.Lock()
 		defer c.mu.Unlock()
 		c.v.SetEnvPrefix(strings.ToUpper(prefix))
@@ -81,18 +80,16 @@ func WithEnv(prefix string) Option {
 		for _, key := range keys {
 			envKey := strings.ReplaceAll(key, ".", "_")
 			if err := c.v.BindEnv(key, fmt.Sprintf("%s_%s", strings.ToUpper(prefix), strings.ToUpper(envKey))); err != nil {
-				c.v.Set("error", fmt.Errorf("failed to bind env var %s: %w", key, err))
-				return
+				return fmt.Errorf("failed to bind env var %s: %w", key, err)
 			}
 		}
 		if err := c.v.Unmarshal(&c.configStruct); err != nil {
-			c.v.Set("error", fmt.Errorf("failed to unmarshal ConfigStruct from env: %w", err))
-			return
+			return fmt.Errorf("failed to unmarshal ConfigStruct from env: %w", err)
 		}
 		if err := c.validateRequiredFields(); err != nil {
-			c.v.Set("error", err)
-			return
+			return err
 		}
+		return nil
 	}
 }
 
@@ -113,10 +110,9 @@ func New(opts ...Option) (*Config, error) {
 		return nil, fmt.Errorf("required field validation failed: %w", err)
 	}
 	for _, opt := range opts {
-		opt(c)
-	}
-	if err := c.v.Get("error"); err != nil {
-		return nil, err.(error)
+		if err := opt(c); err != nil {
+			return nil, err
+		}
 	}
 	return c, nil
 }
