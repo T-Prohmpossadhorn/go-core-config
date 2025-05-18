@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/T-Prohmpossadhorn/go-core/config"
+	config "github.com/T-Prohmpossadhorn/go-core-config"
 )
 
 // Sample environment variables:
@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// Initialize config with environment variables
-	cfg, err := config.New(config.WithEnv("CONFIG_"))
+	cfg, err := config.New(config.WithEnv("CONFIG"))
 	if err != nil {
 		fmt.Printf("Failed to initialize config: %v\n", err)
 		return

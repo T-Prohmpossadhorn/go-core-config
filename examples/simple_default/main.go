@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/T-Prohmpossadhorn/go-core/config"
+	config "github.com/T-Prohmpossadhorn/go-core-config"
 )
 
 func main() {
