@@ -106,6 +106,10 @@ func TestWithDefault(t *testing.T) {
 	}
 	cfg, err := New(WithDefault(defaults))
 	assert.NoError(t, err)
+	s := cfg.GetConfigStruct()
+	assert.Equal(t, "staging", s.Environment)
+	assert.True(t, s.Debug)
+	assert.Equal(t, map[string]string{"key2": "value2"}, s.Settings)
 	assert.Equal(t, "staging", cfg.GetStringWithDefault("environment", "default"))
 	assert.True(t, cfg.GetBool("debug"))
 	assert.Equal(t, map[string]string{"key2": "value2"}, cfg.GetStringMapString("settings"))

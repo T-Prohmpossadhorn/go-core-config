@@ -14,7 +14,7 @@ The `config` package provides a thread-safe configuration management system for 
 
 ## Installation
 ```bash
-go get github.com/T-Prohmpossadhorn/go-core
+go get github.com/T-Prohmpossadhorn/go-core-config
 go get github.com/spf13/viper
 ```
 
@@ -65,10 +65,10 @@ type ConfigStruct struct {
 ## Usage
 ### Initialize Config
 Below are simple examples demonstrating the `config` package with Viper. They show loading configuration from defaults, YAML files, JSON files, and environment variables, with required field validation. For complete executable examples, see:
-- `examples/config/simple_default/main.go`
-- `examples/config/simple_yaml/main.go`
-- `examples/config/simple_json/main.go`
-- `examples/config/simple_env/main.go`
+- `examples/simple_default/main.go`
+- `examples/simple_yaml/main.go`
+- `examples/simple_json/main.go`
+- `examples/simple_env/main.go`
 
 #### Example 1: Using Defaults
 ```go
@@ -76,7 +76,7 @@ package main
 
 import (
     "fmt"
-    "github.com/T-Prohmpossadhorn/go-core/config"
+    "github.com/T-Prohmpossadhorn/go-core-config"
 )
 
 func main() {
@@ -115,7 +115,7 @@ package main
 
 import (
     "fmt"
-    "github.com/T-Prohmpossadhorn/go-core/config"
+    "github.com/T-Prohmpossadhorn/go-core-config"
 )
 
 // Sample config.yaml:
@@ -167,7 +167,7 @@ package main
 
 import (
     "fmt"
-    "github.com/T-Prohmpossadhorn/go-core/config"
+    "github.com/T-Prohmpossadhorn/go-core-config"
 )
 
 // Sample config.json:
@@ -208,7 +208,7 @@ package main
 
 import (
     "fmt"
-    "github.com/T-Prohmpossadhorn/go-core/config"
+    "github.com/T-Prohmpossadhorn/go-core-config"
 )
 
 // Sample environment variables:
@@ -278,7 +278,7 @@ App Name: my-app
 ## Testing
 Run tests with:
 ```bash
-go test -v ./config
+go test ./...
 ```
 Tests cover:
 - Initialization with defaults (struct tags and programmatic).
@@ -307,5 +307,5 @@ If tests fail, particularly `TestLoadFromJSON` or `TestRequiredFieldMissing`:
 - **Check Environment Variables**: Run `printenv | grep CONFIG` to ensure no `CONFIG_*` variables interfere with tests.
 - **Verify File System Permissions**: Ensure write permissions to `/var/folders/...` or `/tmp` for temporary test files. Check if files like `/tmp/config*.json` are created correctly.
 - **Inspect Temporary Files**: Manually inspect the content of temporary JSON files created in tests (e.g., `/tmp/config*.json`) to confirm they match the expected structure.
-- **Run in Clean Environment**: Execute `go test -v ./config` in a fresh terminal to avoid state leakage.
+- **Run in Clean Environment**: Execute `go test ./...` in a fresh terminal to avoid state leakage.
 - **Check Test Logs**: If failures persist, enable debug logging and share the output, along with any additional error messages.

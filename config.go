@@ -24,7 +24,6 @@ type ConfigStruct struct {
 	Settings    map[string]string `mapstructure:"settings" default:""`
 }
 
-// Option configures the Config instance.
 // Option configures the Config instance and may return an error.
 type Option func(*Config) error
 
@@ -63,6 +62,12 @@ func WithDefault(defaults map[string]interface{}) Option {
 		defer c.mu.Unlock()
 		for k, v := range defaults {
 			c.v.SetDefault(k, v)
+		}
+		if err := c.v.Unmarshal(&c.configStruct); err != nil {
+			return fmt.Errorf("failed to unmarshal ConfigStruct: %w", err)
+		}
+		if err := c.validateRequiredFields(); err != nil {
+			return err
 		}
 		return nil
 	}
